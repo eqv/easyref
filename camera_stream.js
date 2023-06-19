@@ -1,6 +1,7 @@
 feather.replace();
 
 const controls = document.querySelector('.controls-top');
+const controls_bot = document.querySelector('.controls-bot');
 const mix_options = document.querySelector('.mix-options>select');
 const render_options = document.querySelector('.render-options>select');
 const video = document.querySelector('video');
@@ -52,6 +53,7 @@ play.onclick = () => {
     pause.classList.remove('d-none');
     return;
   }
+  controls_bot.classList.remove('d-none');
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
     start_stream(constraints);
   }
