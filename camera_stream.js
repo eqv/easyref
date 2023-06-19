@@ -46,11 +46,12 @@ render_options.onchange = () => {
   content.classList.add(render_options.value);
 };
 
-play.onclick = () => {
+const start_video = () => {
   if (stream_started) {
     video.play();
     play.classList.add('d-none');
     pause.classList.remove('d-none');
+    snapshot.classList.remove('d-none');
     return;
   }
   controls_bot.classList.remove('d-none');
@@ -59,21 +60,25 @@ play.onclick = () => {
   }
 };
 
-const pause_stream = () => {
+const pause_video = () => {
   video.pause();
   play.classList.remove('d-none');
   pause.classList.add('d-none');
+  snapshot.classList.add('d-none');
 };
 
 const do_snapshot = () => {
+  snapshot_image.classList.remove('d-none');
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   canvas.getContext('2d').drawImage(video, 0, 0);
   snapshot_image.src = canvas.toDataURL('image/webp');
-  snapshot_image.classList.remove('d-none');
+  snapshot_image.classList.add("anim-zoom");
+  setTimeout(() => { snapshot_image.classList.remove("anim-zoom"); }, 0.1);
 };
 
-pause.onclick = pause_stream;
+play.onclick = start_video
+pause.onclick = pause_video;
 snapshot.onclick = do_snapshot;
 
 const start_stream = async (constraints) => {
