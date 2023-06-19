@@ -74,7 +74,7 @@ const do_snapshot = () => {
   canvas.getContext('2d').drawImage(video, 0, 0);
   snapshot_image.src = canvas.toDataURL('image/webp');
   snapshot_image.classList.add("anim-zoom");
-  setTimeout(() => { snapshot_image.classList.remove("anim-zoom"); }, 0.1);
+  setTimeout(() => { snapshot_image.classList.remove("anim-zoom"); }, 0.2);
 };
 
 play.onclick = start_video
