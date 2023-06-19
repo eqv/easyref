@@ -1,16 +1,16 @@
 feather.replace();
 
-const controls = document.querySelector('.controls-top');
-const controls_bot = document.querySelector('.controls-bot');
+const controls_top = document.querySelector('#controls-top');
+const controls_bot = document.querySelector('#controls-bot');
 const mix_options = document.querySelector('.mix-options>select');
 const render_options = document.querySelector('.render-options>select');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const content = document.querySelector('#content');
 const snapshot_image = document.querySelector('#snapshot-img');
-const play = controls.querySelector('#play');
-const pause = controls.querySelector('#pause');
-const snapshot = controls.querySelector('#snapshot');
+const play = document.querySelector('#play');
+const pause = document.querySelector('#pause');
+const snapshot = document.querySelector('#snapshot');
 
 let stream_started = false;
 
@@ -46,6 +46,20 @@ render_options.onchange = () => {
   content.classList.add(render_options.value);
 };
 
+const handle_stream = (stream) => {
+  video.srcObject = stream;
+  play.classList.add('d-none');
+  controls_bot.classList.remove('d-none');
+  pause.classList.remove('d-none');
+  snapshot.classList.remove('d-none');
+  video.classList.remove('d-none');
+};
+
+const start_stream = async (constraints) => {
+  const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  handle_stream(stream);
+};
+
 const start_video = () => {
   if (stream_started) {
     video.play();
@@ -54,7 +68,8 @@ const start_video = () => {
     snapshot.classList.remove('d-none');
     return;
   }
-  controls_bot.classList.remove('d-none');
+  controls_top.classList.remove('splash-screen');
+  play.classList.add('d-none');
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
     start_stream(constraints);
   }
@@ -77,19 +92,8 @@ const do_snapshot = () => {
   setTimeout(() => { snapshot_image.classList.remove("anim-zoom"); }, 0.2);
 };
 
+
 play.onclick = start_video
 pause.onclick = pause_video;
 snapshot.onclick = do_snapshot;
 
-const start_stream = async (constraints) => {
-  const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  handle_stream(stream);
-};
-
-
-const handle_stream = (stream) => {
-  video.srcObject = stream;
-  play.classList.add('d-none');
-  pause.classList.remove('d-none');
-  snapshot.classList.remove('d-none');
-};

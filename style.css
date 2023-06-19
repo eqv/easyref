@@ -134,13 +134,26 @@ video {
   background: rgba(0,0,0,0.2);
 }
 
-.mix-options {
-  position: relative;
-  left: 0px;
-  top: 0px;
+#controls-top.splash-screen {
+  position:unset;
+  margin:auto;
+  margin-top:10em;
 }
 
-.controls-top {
+#controls-top.splash-screen > .play{
+  width: 10em;
+  height: 10em;
+}
+
+#controls-top > button.play > svg {
+  height: 40px;
+  width: 36px;
+}
+
+.mix-options {
+}
+
+#controls-top {
   position: absolute;
   right: 20px;
   top: 20px;
@@ -150,7 +163,7 @@ video {
 
 }
 
-.controls-bot {
+#controls-bot {
   position: absolute;
   bottom: 20px;
   display: -webkit-box;
@@ -158,7 +171,7 @@ video {
   display: flex;
 }
 
-.controls-top > button {
+#controls-top > button {
   width: 5em;
   height: 5em;
   text-align: center;
@@ -172,14 +185,14 @@ video {
   }
 }
 
-.controls-top > button:active {
+#controls-top > button:active {
   -webkit-transform: scale(1.05, 1.05);
       -ms-transform: scale(1.05, 1.05);
           transform: scale(1.05, 1.05);
 }
 
 @media (min-width: 300px) and (max-width: 400px) {
-  .controls-top {
+  #controls-top {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
         -ms-flex-direction: column;
@@ -191,7 +204,7 @@ video {
   }
 }
 
-.controls-top > button > svg {
+#controls-top > button > svg {
   height: 20px;
   width: 18px;
   text-align: center;
@@ -199,41 +212,41 @@ video {
   padding: 0;
 }
 
-.controls-top > button.play {
+#controls-top > button.play {
   border: 2px solid #d7005f;
   background: #d7005f20;
 }
 
-.controls-top > button.play:hover {
+#controls-top > button.play:hover {
     background: #d7005f50;
 }
 
-.controls-top > button.play > svg{
+#controls-top > button.play > svg{
   color: #d7005f;
 }
 
-.controls-top button.pause {
+#controls-top button.pause {
   border: 2px solid #008496;
   background: #00849620;
 }
 
-.controls-top button.pause:hover {
+#controls-top button.pause:hover {
     background: #00849650;
 }
 
-.controls-top button.pause > svg {
+#controls-top button.pause > svg {
     color: #008496;
 }
 
-.controls-top button.snapshot {
+#controls-top button.snapshot {
   border: 2px solid #61b206;
   background: #61b20620;
 }
-.controls-top button.snapshot:hover {
+#controls-top button.snapshot:hover {
     background: #61b20650;
 }
 
-.controls-top button.snapshot > svg {
+#controls-top button.snapshot > svg {
     color: #61b206;
 }
 
