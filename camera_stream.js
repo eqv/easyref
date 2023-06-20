@@ -6,11 +6,15 @@ const mix_options = document.querySelector('.mix-options>select');
 const render_options = document.querySelector('.render-options>select');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
-const content = document.querySelector('#content');
+const main_frame = document.querySelector('#main')
+const reference_frame = document.querySelector('#reference')
+const splash_frame = document.querySelector('#splash')
+const main_content = document.querySelector('#main>.content');
 const snapshot_image = document.querySelector('#snapshot-img');
 const play = document.querySelector('#play');
 const pause = document.querySelector('#pause');
 const snapshot = document.querySelector('#snapshot');
+
 
 let stream_started = false;
 
@@ -31,19 +35,19 @@ const constraints = {
 };
 
 mix_options.onchange = () => {
-  content.classList.remove('mix-blink');
-  content.classList.remove('mix-blend');
-  content.classList.remove('mix-darken');
-  content.classList.remove('mix-video');
-  content.classList.remove('mix-reference');
-  content.classList.add(mix_options.value);
+  main_content.classList.remove('mix-blink');
+  main_content.classList.remove('mix-blend');
+  main_content.classList.remove('mix-darken');
+  main_content.classList.remove('mix-video');
+  main_content.classList.remove('mix-reference');
+  main_content.classList.add(mix_options.value);
 };
 
 render_options.onchange = () => {
-  content.classList.remove('render-normal');
-  content.classList.remove('render-mirror');
-  content.classList.remove('render-value');
-  content.classList.add(render_options.value);
+  main_content.classList.remove('render-normal');
+  main_content.classList.remove('render-mirror');
+  main_content.classList.remove('render-value');
+  main_content.classList.add(render_options.value);
 };
 
 const handle_stream = (stream) => {
@@ -92,8 +96,56 @@ const do_snapshot = () => {
   setTimeout(() => { snapshot_image.classList.remove("anim-zoom"); }, 0.2);
 };
 
+const goto_reference_frame = () => {
+  splash_frame.classList.add("d-none");
+  main_frame.classList.add("d-none");
+  reference_frame.classList.remove("d-none");
+}
+
 
 play.onclick = start_video
 pause.onclick = pause_video;
 snapshot.onclick = do_snapshot;
+splash_frame.onclick = goto_reference_frame;
 
+// Select reference screen
+const img_ref_preview = document.querySelector('#ref-preview');
+const btn_ref_url = document.querySelector('#ref-link');
+const btn_ref_file = document.querySelector('#ref-file');
+const btn_ref_use = document.querySelector('#ref-use');
+const input_ref_file = document.querySelector('#ref-file-input');
+
+const pick_ref_url = () => {
+  url = prompt("Please enter an image url", "");
+  if(url){
+    img_ref_preview.src = url
+  }
+}
+
+const pick_ref_file = () => {
+  console.log("about to click");
+  input_ref_file.click();
+}
+
+
+const handle_file_dialoge = e => { 
+  console.log("on change");
+  var file = e.target.files[0]; 
+  var reader = new FileReader();
+  reader.readAsDataURL(file); 
+  reader.onload = readerEvent => {
+    var content = readerEvent.target.result; 
+    img_ref_preview.src = content;
+  }
+}
+
+const goto_main_frame = () => {
+  splash_frame.classList.add("d-none");
+  reference_frame.classList.add("d-none");
+  main_frame.classList.remove("d-none");
+}
+
+btn_ref_url.onclick = pick_ref_url;
+btn_ref_file.onclick = pick_ref_file;
+btn_ref_use.onclick = goto_main_frame;
+input_ref_file.onchange = handle_file_dialoge;

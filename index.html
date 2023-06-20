@@ -1,49 +1,65 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
     <title>EasyReference</title>
 </head>
+
 <body>
-    <h1>EasyReference</h1>
-<div id="content" class="mix-blend">
-    <canvas class="d-none"></canvas>
-    <video autoplay class="d-none"></video>
-    <img id="snapshot-img" class="d-none" alt="">
-
-    <div id="controls-top" class="splash-screen">
-        <button id="play" class="btn play" title="Play"><i data-feather="play-circle"></i></button>
-        <button id="pause" class="btn  pause d-none" title="Pause"><i data-feather="pause"></i></button>
-        <button id="snapshot" class="btn snapshot d-none" title="Snapshot"><i data-feather="image"></i></button>
+    <div id="splash" class="content d-none">
+        <img src="splash.jpg" alt="splashscreen, press to start selecting reference image">
     </div>
-    <div id="controls-bot" class="d-none">
-        <div class="render-options">
-            <select name="" id="" class="render-select">
-                <option value="render-normal">Normal</option>
-                <option value="render-value">Value Only</option>
-                <option value="render-mirror">Mirror</option>
-            </select>
-        </div>
-        <div class="mix-options">
-            <select name="" id="" class="mix-select">
-                <option value="mix-blend">Blend</option>
-                <option value="mix-blink">Blink</option>
-                <option value="mix-darken">Darken (for lineart)</option>
-                <option value="mix-reference">Reference</option>
-                <option value="mix-video">Video</option>
-            </select>
+    <div id="reference" class="d-none">
+        <img id="ref-preview" />
+        <div id="ref-ui">
+            <h1>Pick a Reference</h1>
+            <button id="ref-file" class="btn" title="From File"><i data-feather="file"></i> From Device</button>
+            <button id="ref-link" class="btn" title="From Link"><i data-feather="link"></i> From Link</button>
+            <button id="ref-use" class="btn" title="Use Reference"><i data-feather="check"></i></button>
+            <input id="ref-file-input" type="file" name="Reference File Input" class="d-none" />
         </div>
     </div>
-</div>
+    <div id="main" class="">
+        <h1>EasyReference</h1>
+        <div id="content" class="content mix-blend">
+            <canvas class="d-none"></canvas>
+            <video autoplay class="d-none"></video>
+            <img id="snapshot-img" class="d-none" alt="">
 
-<script src="https://unpkg.com/feather-icons"></script>
-<script src="camera_stream.js"></script>
+            <div id="controls-top" class="splash-screen">
+                <button id="play" class="btn play" title="Play"><i data-feather="play-circle"></i></button>
+                <button id="pause" class="btn  pause d-none" title="Pause"><i data-feather="pause"></i></button>
+                <button id="snapshot" class="btn snapshot d-none" title="Snapshot"><i data-feather="image"></i></button>
+            </div>
+            <div id="controls-bot" class="d-none">
+                <div class="render-options">
+                    <select name="" id="" class="render-select">
+                        <option value="render-normal">Normal</option>
+                        <option value="render-value">Value Only</option>
+                        <option value="render-mirror">Mirror</option>
+                    </select>
+                </div>
+                <div class="mix-options">
+                    <select name="" id="" class="mix-select">
+                        <option value="mix-blend">Blend</option>
+                        <option value="mix-blink">Blink</option>
+                        <option value="mix-darken">Darken (for lineart)</option>
+                        <option value="mix-reference">Reference</option>
+                        <option value="mix-video">Video</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="camera_stream.js"></script>
 </body>
+
 </html>
-
-
