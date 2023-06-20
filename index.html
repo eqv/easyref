@@ -12,48 +12,49 @@
 </head>
 
 <body>
-    <div id="splash" class="content d-none">
-        <img src="splash.jpg" alt="splashscreen, press to start selecting reference image">
-    </div>
-    <div id="reference" class="d-none">
-        <img id="ref-preview" />
-        <div id="ref-ui">
+    <div id="reference" class="">
+        <img id="ref-preview"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Bertrand_Russell_1957.jpg/640px-Bertrand_Russell_1957.jpg" />
+        <div class="top-ui">
             <h1>Pick a Reference</h1>
-            <button id="ref-file" class="btn" title="From File"><i data-feather="file"></i> From Device</button>
-            <button id="ref-link" class="btn" title="From Link"><i data-feather="link"></i> From Link</button>
-            <button id="ref-use" class="btn" title="Use Reference"><i data-feather="check"></i></button>
-            <input id="ref-file-input" type="file" name="Reference File Input" class="d-none" />
+            <div class="button-flex">
+                <button id="ref-file" class="btn" title="From File"><i data-feather="file"></i> From Device</button>
+                <button id="ref-link" class="btn" title="From Link"><i data-feather="link"></i> From Link</button>
+                <button id="ref-use" class="btn" title="Use Reference"><i data-feather="check"></i></button>
+                <input id="ref-file-input" type="file" name="Reference File Input" class="d-none" />
+            </div>
         </div>
     </div>
-    <div id="main" class="">
-        <h1>EasyReference</h1>
-        <div id="content" class="content mix-blend">
+    <div id="main" class="d-none">
+        <div id="main-rendering" class="mix-blend">
             <canvas class="d-none"></canvas>
             <video autoplay class="d-none"></video>
-            <img id="snapshot-img" class="d-none" alt="">
+            <img id="snapshot-img" class="" alt="">
 
-            <div id="controls-top" class="splash-screen">
+            <div id="controls-top" class="top-ui">
+                <h1>Draw and Check</h1>
+                <div class="button-flex">
+                    <div class="render-options">
+                        <select name="" id="" class="render-select">
+                            <option value="render-normal">Normal</option>
+                            <option value="render-value">Value Only</option>
+                            <option value="render-mirror">Mirror</option>
+                        </select>
+                    </div>
+                    <div class="mix-options">
+                        <select name="" id="" class="mix-select">
+                            <option value="mix-blend">Blend</option>
+                            <option value="mix-blink">Blink</option>
+                            <option value="mix-darken">Darken (for lineart)</option>
+                            <option value="mix-reference">Reference</option>
+                            <option value="mix-video">Video</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="controls-bot" class="bottom-ui button-flex">
                 <button id="play" class="btn play" title="Play"><i data-feather="play-circle"></i></button>
                 <button id="pause" class="btn  pause d-none" title="Pause"><i data-feather="pause"></i></button>
-                <button id="snapshot" class="btn snapshot d-none" title="Snapshot"><i data-feather="image"></i></button>
-            </div>
-            <div id="controls-bot" class="d-none">
-                <div class="render-options">
-                    <select name="" id="" class="render-select">
-                        <option value="render-normal">Normal</option>
-                        <option value="render-value">Value Only</option>
-                        <option value="render-mirror">Mirror</option>
-                    </select>
-                </div>
-                <div class="mix-options">
-                    <select name="" id="" class="mix-select">
-                        <option value="mix-blend">Blend</option>
-                        <option value="mix-blink">Blink</option>
-                        <option value="mix-darken">Darken (for lineart)</option>
-                        <option value="mix-reference">Reference</option>
-                        <option value="mix-video">Video</option>
-                    </select>
-                </div>
             </div>
         </div>
     </div>
