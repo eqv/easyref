@@ -54,8 +54,13 @@ const handle_stream = (stream) => {
 };
 
 const start_stream = async (constraints) => {
-  const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  handle_stream(stream);
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints)
+    handle_stream(stream);
+  } catch (e) {
+    alert("Couldn't get the video feed - comparing reference vs your drawing won't work!");
+    console.log(e);
+  }
 };
 
 const start_video = () => {
@@ -69,7 +74,7 @@ const start_video = () => {
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
     start_stream(constraints);
   } else {
-    alert("Couldn't get the video feed - comparing the reference and you drawing won't work!");
+    alert("Couldn't get the video feed - comparing reference vs your drawing won't work!");
   }
 };
 
