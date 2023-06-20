@@ -68,6 +68,8 @@ const start_video = () => {
   play.classList.add('d-none');
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
     start_stream(constraints);
+  } else {
+    alert("Couldn't get the video feed - comparing the reference and you drawing won't work!");
   }
 };
 
