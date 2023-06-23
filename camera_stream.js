@@ -93,16 +93,6 @@ const pause_video = () => {
   pause.classList.add('d-none');
 };
 
-// const do_snapshot = () => {
-//   snapshot_image.classList.remove('d-none');
-//   canvas.width = video.videoWidth;
-//   canvas.height = video.videoHeight;
-//   canvas.getContext('2d').drawImage(video, 0, 0);
-//   snapshot_image.src = canvas.toDataURL('image/webp');
-//   snapshot_image.classList.add("anim-zoom");
-//   setTimeout(() => { snapshot_image.classList.remove("anim-zoom"); }, 0.2);
-// };
-
 const goto_reference_frame = () => {
   main_frame.classList.add("d-none");
   reference_frame.classList.remove("d-none");
@@ -154,3 +144,63 @@ btn_ref_url.onclick = pick_ref_url;
 btn_ref_file.onclick = pick_ref_file;
 btn_ref_use.onclick = goto_main_frame;
 input_ref_file.onchange = handle_file_dialoge;
+
+var first_touch = null;
+
+const make_touch = (p1, p2) => {
+      const x1 = p1.screenX;
+      const y1 = p1.screenY;
+      const x2 = p2.screenX;
+      const y2 = p2.screenY;
+      var angle =Math.atan2(y1-y2, x1-x2) * 180 / Math.PI;
+      if(angle < 0){
+        angle += 360;
+      }
+      angle = angle % 360;
+      return {
+        x: (x1+x2)/2,
+        y: (y1+y2)/2,
+        len: Math.sqrt((x1-x2)**2, (y1-y2)**2),
+        angle: angle
+      }
+}
+
+const move_handler = (ev) => {b
+  // TODO: we migth have to handle multiple touches here.
+  ev.preventDefault();
+  // TODO: it seems like sometimes the order becomes weird or something?
+  if (e.targetTouches.length === 2 && e.changedTouches.length === 2) {
+    const p1 = e.targetTouches[0];
+    const p2 = e.targetTouches[1];
+    if(first_touch){
+      const sensitivity = 5;
+      const cur_touch = make_touch(p1,p2);
+      const delta_x = (cur_touch.x - first_touch.x)/sensitivity;
+      const delta_y = (cur_touch.y - first_touch.y)/sensitivity;
+      const delta_s = (cur_touch.len/first_touch.len-1)/(sensitivity*5) + 1;
+      var delta_a = cur_touch.angle - first_touch.angle;
+      if(delta_a > 180){
+        delta_a = delta_a - 360;
+      }
+      video.style.transform = "scale("+ delta_s+") translate(" + delta_x+ "px," + delta_y + "px)"+" rotate("+(delta_a/(sensitivity*2))+"deg)";
+    } else {
+      first_touch = make_touch(p1,p2);
+    }
+  }
+}
+
+const end_handler = (ev) => {
+  ev.preventDefault();
+  first_touch = null;
+}
+
+// const start_handler = (ev) => {
+//   ev.preventDefault();
+// }
+
+//snapshot_image.ontouchstart = ( event ) => { console.log('start'); };
+snapshot_image.ontouchmove = move_handler
+snapshot_image.ontouchend = end_handler;
+//snapshot_image.ontouchcancel = ( event ) => { console.log('cancel'); };
+
+// goto_main_frame();
