@@ -165,9 +165,9 @@ const make_touch = (p1, p2) => {
       }
 }
 
-const move_handler = (ev) => {b
+const move_handler = (e) => {
   // TODO: we migth have to handle multiple touches here.
-  ev.preventDefault();
+  e.preventDefault();
   // TODO: it seems like sometimes the order becomes weird or something?
   if (e.targetTouches.length === 2 && e.changedTouches.length === 2) {
     const p1 = e.targetTouches[0];
