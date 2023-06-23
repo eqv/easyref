@@ -79,45 +79,26 @@ video {
 }
 
 /* blending styles */
-@-webkit-keyframes blinking {
-  0% {
-    opacity: 0.2;
-  }
-
-  50% {
-    opacity: 0.2;
-  }
-
-  51% {
-    opacity: 0.8;
-  }
-
-  100% {
-    opacity: 0.8;
-  }
-}
-
 
 @keyframes blinking {
   0% {
-    opacity: 0.2;
+    opacity: 0.05;
   }
 
   50% {
-    opacity: 0.2;
+    opacity: 0.05;
   }
 
   51% {
-    opacity: 0.8;
+    opacity: 0.95;
   }
 
   100% {
-    opacity: 0.8;
+    opacity: 0.95;
   }
 }
 
 .mix-blink>img {
-  -webkit-animation: blinking 0.8s ease-in-out infinite;
   animation: blinking 0.8s ease-in-out infinite;
 }
 
@@ -139,7 +120,6 @@ video {
 
 .render-value>video,
 .render-value>img {
-  -webkit-filter: saturate(0%);
   filter: saturate(0%);
 }
 
@@ -147,7 +127,5 @@ video {
 
 .render-mirror>video,
 .render-mirror>img {
-  -webkit-transform: scaleX(-1);
-  -ms-transform: scaleX(-1);
   transform: scaleX(-1);
 }
