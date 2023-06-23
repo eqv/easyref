@@ -30,7 +30,7 @@ const constraints = {
   }
 };
 
-mix_options.onchange = () => {
+const apply_mix_options = () => {
   main_content.classList.remove('mix-blink');
   main_content.classList.remove('mix-blend');
   main_content.classList.remove('mix-darken');
@@ -39,12 +39,20 @@ mix_options.onchange = () => {
   main_content.classList.add(mix_options.value);
 };
 
-render_options.onchange = () => {
+const set_mix_option = (index) => {
+  mix_options.selectedIndex = index;
+  apply_mix_options();
+}
+
+const apply_render_options = () => {
   main_content.classList.remove('render-normal');
   main_content.classList.remove('render-mirror');
   main_content.classList.remove('render-value');
   main_content.classList.add(render_options.value);
 };
+
+mix_options.onchange = apply_mix_options;
+render_options.onchange = () => apply_render_options
 
 const handle_stream = (stream) => {
   video.srcObject = stream;
@@ -71,6 +79,7 @@ const start_video = () => {
     return;
   }
   play.classList.add('d-none');
+  set_mix_option(0);
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
     start_stream(constraints);
   } else {

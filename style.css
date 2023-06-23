@@ -117,8 +117,8 @@ video {
 }
 
 .mix-blink>img {
-  -webkit-animation: blinking 0.5s ease-in-out infinite;
-  animation: blinking 0.5s ease-in-out infinite;
+  -webkit-animation: blinking 0.8s ease-in-out infinite;
+  animation: blinking 0.8s ease-in-out infinite;
 }
 
 .mix-darken>img {
