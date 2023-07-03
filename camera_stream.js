@@ -6,7 +6,8 @@ const video = document.querySelector('video');
 //const canvas = document.querySelector('canvas');
 const main_frame = document.querySelector('#main')
 const reference_frame = document.querySelector('#reference')
-const main_content = document.querySelector('#main-rendering');
+const main_rendering = document.querySelector('#main-rendering');
+const content_rendering = document.querySelector('#content-rendering');
 const snapshot_image = document.querySelector('#snapshot-img');
 const play = document.querySelector('#play');
 const pause = document.querySelector('#pause');
@@ -31,12 +32,12 @@ const constraints = {
 };
 
 const apply_mix_options = () => {
-  main_content.classList.remove('mix-blink');
-  main_content.classList.remove('mix-blend');
-  main_content.classList.remove('mix-darken');
-  main_content.classList.remove('mix-video');
-  main_content.classList.remove('mix-reference');
-  main_content.classList.add(mix_options.value);
+  content_rendering.classList.remove('mix-blink');
+  content_rendering.classList.remove('mix-blend');
+  content_rendering.classList.remove('mix-darken');
+  content_rendering.classList.remove('mix-video');
+  content_rendering.classList.remove('mix-reference');
+  content_rendering.classList.add(mix_options.value);
 };
 
 const set_mix_option = (index) => {
@@ -45,10 +46,10 @@ const set_mix_option = (index) => {
 }
 
 const apply_render_options = () => {
-  main_content.classList.remove('render-normal');
-  main_content.classList.remove('render-mirror');
-  main_content.classList.remove('render-value');
-  main_content.classList.add(render_options.value);
+  content_rendering.classList.remove('render-normal');
+  content_rendering.classList.remove('render-mirror');
+  content_rendering.classList.remove('render-value');
+  content_rendering.classList.add(render_options.value);
 };
 
 mix_options.onchange = apply_mix_options;
@@ -145,62 +146,10 @@ btn_ref_file.onclick = pick_ref_file;
 btn_ref_use.onclick = goto_main_frame;
 input_ref_file.onchange = handle_file_dialoge;
 
-var first_touch = null;
-
-const make_touch = (p1, p2) => {
-      const x1 = p1.screenX;
-      const y1 = p1.screenY;
-      const x2 = p2.screenX;
-      const y2 = p2.screenY;
-      var angle =Math.atan2(y1-y2, x1-x2) * 180 / Math.PI;
-      if(angle < 0){
-        angle += 360;
-      }
-      angle = angle % 360;
-      return {
-        x: (x1+x2)/2,
-        y: (y1+y2)/2,
-        len: Math.sqrt((x1-x2)**2, (y1-y2)**2),
-        angle: angle
-      }
+const pinch_align_video = (delta_x, delta_y, delta_s, delta_a) => {
+      video.style.transform = "scale("+ delta_s+") translate(" + delta_x+ "px," + delta_y + "px)"+" rotate("+(delta_a)+"deg)";
 }
 
-const move_handler = (e) => {
-  // TODO: we migth have to handle multiple touches here.
-  e.preventDefault();
-  // TODO: it seems like sometimes the order becomes weird or something?
-  if (e.targetTouches.length === 2 && e.changedTouches.length === 2) {
-    const p1 = e.targetTouches[0];
-    const p2 = e.targetTouches[1];
-    if(first_touch){
-      const sensitivity = 5;
-      const cur_touch = make_touch(p1,p2);
-      const delta_x = (cur_touch.x - first_touch.x)/sensitivity;
-      const delta_y = (cur_touch.y - first_touch.y)/sensitivity;
-      const delta_s = (cur_touch.len/first_touch.len-1)/(sensitivity*5) + 1;
-      var delta_a = cur_touch.angle - first_touch.angle;
-      if(delta_a > 180){
-        delta_a = delta_a - 360;
-      }
-      video.style.transform = "scale("+ delta_s+") translate(" + delta_x+ "px," + delta_y + "px)"+" rotate("+(delta_a/(sensitivity*2))+"deg)";
-    } else {
-      first_touch = make_touch(p1,p2);
-    }
-  }
-}
+set_pinch_handler(1/5, 1/10, 1/25, pinch_align_video)
 
-const end_handler = (ev) => {
-  ev.preventDefault();
-  first_touch = null;
-}
-
-// const start_handler = (ev) => {
-//   ev.preventDefault();
-// }
-
-//snapshot_image.ontouchstart = ( event ) => { console.log('start'); };
-snapshot_image.ontouchmove = move_handler
-snapshot_image.ontouchend = end_handler;
-//snapshot_image.ontouchcancel = ( event ) => { console.log('cancel'); };
-
-// goto_main_frame();
+goto_main_frame();

@@ -26,10 +26,12 @@
         </div>
     </div>
     <div id="main" class="d-none">
-        <div id="main-rendering" class="mix-blend">
-            <canvas class="d-none"></canvas>
-            <video autoplay class="d-none"></video>
-            <img id="snapshot-img" class="" alt="">
+        <div id="main-rendering">
+            <div id="content-rendering" class ="mix-blend">
+                <canvas class="d-none"></canvas>
+                <video autoplay class="d-none"></video>
+                <img id="snapshot-img" class="" alt="">
+            </div>
 
             <div id="controls-top" class="top-ui">
                 <div class="button-flex">
@@ -59,6 +61,7 @@
     </div>
 
     <script src="https://unpkg.com/feather-icons"></script>
+    <script src="pinch.js"></script>
     <script src="camera_stream.js"></script>
 </body>
 
