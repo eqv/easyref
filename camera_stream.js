@@ -52,7 +52,7 @@ const apply_render_options = () => {
 };
 
 mix_options.onchange = apply_mix_options;
-render_options.onchange = () => apply_render_options
+render_options.onchange = apply_render_options
 
 const handle_stream = (stream) => {
   video.srcObject = stream;
