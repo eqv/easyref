@@ -123,6 +123,10 @@ video {
   filter: saturate(0%);
 }
 
+.btn.active {
+  color: lightseagreen;
+}
+
 .render-normal {}
 
 .render-mirror>video,

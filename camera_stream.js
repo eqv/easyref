@@ -11,6 +11,7 @@ const content_rendering = document.querySelector('#content-rendering');
 const snapshot_image = document.querySelector('#snapshot-img');
 const play = document.querySelector('#play');
 const pause = document.querySelector('#pause');
+const zoom = document.querySelector('#zoom');
 
 
 let stream_started = false;
@@ -79,6 +80,7 @@ const start_video = () => {
     pause.classList.remove('d-none');
     return;
   }
+  zoom.classList.add('d-none');
   play.classList.add('d-none');
   set_mix_option(0);
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
@@ -86,12 +88,15 @@ const start_video = () => {
   } else {
     alert("Couldn't get the video feed - comparing reference vs your drawing won't work!");
   }
+  set_pinch_align_mode();
 };
 
 const pause_video = () => {
   video.pause();
   play.classList.remove('d-none');
   pause.classList.add('d-none');
+  zoom.classList.remove('d-none');
+  set_pinch_align_mode();
 };
 
 const goto_reference_frame = () => {
@@ -147,9 +152,28 @@ btn_ref_use.onclick = goto_main_frame;
 input_ref_file.onchange = handle_file_dialoge;
 
 const pinch_align_video = (delta_x, delta_y, delta_s, delta_a) => {
-      video.style.transform = "scale("+ delta_s+") translate(" + delta_x+ "px," + delta_y + "px)"+" rotate("+(delta_a)+"deg)";
+  video.style.transform = "scale(" + delta_s + ") translate(" + delta_x + "px," + delta_y + "px)" + " rotate(" + (delta_a) + "deg)";
 }
 
-set_pinch_handler(1/5, 1/10, 1/25, pinch_align_video)
+const pinch_zoom_content = (delta_x, delta_y, delta_s, delta_a) => {
+  if (delta_s < 1) { delta_s = 1; }
+  content_rendering.style.transform = "scale(" + delta_s + ") translate(" + delta_x + "px," + delta_y + "px)";
+}
+
+const set_pinch_align_mode = () => {
+  set_pinch_handler(1 / 5, 1 / 10, 1 / 25, pinch_align_video);
+  content_rendering.style.transform = "";
+}
+
+const set_pinch_zoom_mode = () => {
+  if (zoom.classList.contains("active")) {
+    zoom.classList.remove("active");
+    set_pinch_align_mode();
+  } else {
+    zoom.classList.add("active");
+    set_pinch_handler(1, 0, 1, pinch_zoom_content);
+  }
+}
+zoom.onclick = set_pinch_zoom_mode;
 
 goto_main_frame();
