@@ -176,4 +176,4 @@ const set_pinch_zoom_mode = () => {
 }
 zoom.onclick = set_pinch_zoom_mode;
 
-goto_main_frame();
+//goto_main_frame();
