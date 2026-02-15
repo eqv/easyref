@@ -1,0 +1,368 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKLAB Luminosity Match</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;line-height:1.5;min-height:100vh;transition:background-color .5s}
+  .container{min-height:100vh;display:flex;flex-direction:column;align-items:center}
+  header{width:100%;max-width:48rem;padding:2rem 1.5rem 1rem}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+  .title{font-size:1.5rem;font-weight:700;letter-spacing:-.025em}
+  .subtitle{font-size:.875rem;margin-top:.25rem}
+  .avg-box{text-align:right;border-radius:.75rem;padding:.5rem 1rem}
+  .avg-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+  .avg-value{font-size:1.5rem;font-weight:700}
+  .avg-rounds{font-size:.7rem}
+
+  main{width:100%;max-width:48rem;padding:0 1.5rem;flex:1;display:flex;flex-direction:column}
+
+  .swatches{display:flex;align-items:stretch;justify-content:center}
+  .swatch-col{flex:1;display:flex;flex-direction:column;min-width:0}
+  .swatch{border-radius:1rem;position:relative;overflow:hidden;height:220px;box-shadow:0 8px 32px rgba(0,0,0,.2);transition:background-color .15s}
+  .swatch-label{position:absolute;top:.75rem;left:1rem;padding:.25rem .625rem;border-radius:.5rem;background:rgba(0,0,0,.2);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:rgba(255,255,255,.8);font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  .swatch-lval{position:absolute;bottom:.75rem;left:1rem;padding:.25rem .625rem;border-radius:.5rem;background:rgba(0,0,0,.2);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:rgba(255,255,255,.7);font-size:.7rem;font-family:'SF Mono',SFMono-Regular,Menlo,Consolas,monospace}
+
+  .slider-section{margin-top:2rem;border-radius:1rem;padding:1.5rem}
+  .slider-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+  .slider-label{font-size:.875rem;font-weight:600}
+  .slider-value{font-size:1.125rem;font-family:'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;font-weight:700}
+
+  .slider-track-wrap{position:relative;height:2.5rem;display:flex;align-items:center}
+  .slider-gradient{position:absolute;left:0;right:0;height:.75rem;border-radius:9999px;overflow:hidden;pointer-events:none}
+  .target-marker{position:absolute;height:2rem;width:3px;border-radius:9999px;background:#fff;z-index:5;pointer-events:none;transform:translateX(-50%);box-shadow:0 0 8px rgba(255,255,255,.6),0 0 0 2px rgba(0,0,0,.3);transition:opacity .3s}
+
+  input[type=range]{position:relative;width:100%;height:.75rem;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer;z-index:10}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;transition:transform .15s;background:var(--thumb-color,#888)}
+  input[type=range]::-moz-range-thumb{width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;background:var(--thumb-color,#888)}
+  input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.15)}
+  input[type=range]:disabled{cursor:not-allowed;opacity:.7}
+  input[type=range]:disabled::-webkit-slider-thumb{cursor:not-allowed}
+
+  .actions{margin-top:1.5rem;display:flex;flex-direction:column;align-items:center}
+
+  .btn{padding:.75rem 2rem;border-radius:.75rem;font-weight:600;color:#fff;font-size:1.125rem;border:none;cursor:pointer;transition:all .2s;outline:none;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+  .btn:hover{transform:scale(1.05)}
+  .btn:active{transform:scale(.95)}
+  .btn-submit{background:linear-gradient(135deg,#7c3aed,#4f46e5);box-shadow:0 4px 14px rgba(79,70,229,.35)}
+  .btn-submit:hover{background:linear-gradient(135deg,#8b5cf6,#6366f1)}
+  .btn-next{width:100%;background:linear-gradient(135deg,#059669,#0d9488);box-shadow:0 4px 14px rgba(5,150,105,.35);margin-top:1rem}
+  .btn-next:hover{background:linear-gradient(135deg,#10b981,#14b8a6)}
+
+  .result-card{width:100%;max-width:28rem;border-radius:1rem;padding:1.5rem;text-align:center}
+  .result-emoji{font-size:2.5rem;margin-bottom:.5rem}
+  .result-accuracy{font-size:2.5rem;font-weight:700}
+  .result-label{font-size:1.125rem;font-weight:500;margin-top:.25rem}
+  .result-grid{margin-top:1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;font-size:.875rem}
+  .result-grid-title{font-weight:500}
+  .result-grid-val{font-family:'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;font-size:1.125rem}
+
+  .comparison{margin-top:1rem;display:flex;align-items:center;justify-content:center}
+  .comp-item{text-align:center}
+  .comp-swatch{width:4rem;height:4rem;border-radius:.75rem;box-shadow:0 2px 8px rgba(0,0,0,.15);margin:0 auto}
+  .comp-label{font-size:.7rem;margin-top:.25rem}
+
+  .settings{margin-top:2rem;border-radius:1rem;padding:1.5rem}
+  .settings-title{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
+  .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+  @media(max-width:640px){.settings-grid{grid-template-columns:1fr}}
+  .setting-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+  .setting-label{font-size:.875rem;font-weight:500}
+  .setting-val{font-size:.875rem;font-family:'SF Mono',SFMono-Regular,Menlo,Consolas,monospace}
+  .setting-slider-wrap{position:relative}
+  .bg-gradient-bar{position:absolute;inset:0;height:.5rem;border-radius:9999px;top:50%;transform:translateY(-50%);pointer-events:none;background:linear-gradient(to right,oklab(0 0 0),oklab(.5 0 0),oklab(1 0 0))}
+  .setting-slider{width:100%;height:.5rem;border-radius:9999px;-webkit-appearance:none;appearance:none;cursor:pointer}
+  .setting-slider::-webkit-slider-thumb{-webkit-appearance:none;width:1.25rem;height:1.25rem;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer;border:2px solid #d1d5db}
+  .setting-slider::-moz-range-thumb{width:1.25rem;height:1.25rem;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer;border:2px solid #d1d5db}
+
+  .history-toggle{display:flex;align-items:center;gap:.5rem;font-size:.875rem;font-weight:500;background:none;border:none;cursor:pointer;margin-top:1.5rem;padding:.25rem 0}
+  .history-toggle svg{width:1rem;height:1rem;transition:transform .2s}
+  .history-toggle.open svg{transform:rotate(90deg)}
+  .history-table-wrap{margin-top:.75rem;border-radius:.75rem;overflow:hidden}
+  .history-table{width:100%;font-size:.875rem;border-collapse:collapse}
+  .history-table th{padding:.75rem 1rem;text-align:left;font-weight:500;font-size:.8rem}
+  .history-table th:last-child{text-align:right}
+  .history-table td{padding:.625rem 1rem;font-family:'SF Mono',SFMono-Regular,Menlo,Consolas,monospace}
+  .history-table td:last-child{text-align:right;font-weight:700}
+
+  footer{width:100%;text-align:center;padding:1rem;font-size:.7rem}
+
+  .c-green{color:#34d399}.c-emerald{color:#6ee7b7}.c-yellow{color:#facc15}.c-orange{color:#fb923c}.c-red{color:#f87171}
+</style>
+</head>
+<body style="background-color: oklab(0.25 0 0);">
+<div class="container" id="app"><header><div class="header-inner"><div><div class="title" style="color:rgba(255,255,255,0.85)">OKLAB Luminosity Match</div><div class="subtitle" style="color:rgba(255,255,255,0.45)">Match the lightness of Color B to Color A</div></div></div></header><main><div class="swatches" style="gap:40px"><div class="swatch-col"><div class="swatch" style="background:oklab(0.7741574050174056 0.01493706068773637 0.018208661550339723)"><div class="swatch-label">Color A · Target</div></div></div><div class="swatch-col"><div class="swatch" style="background:oklab(0.4363193186526374 0.12192264132337467 -0.001987828345611464)"><div class="swatch-label">Color B · Adjust</div><div class="swatch-lval">L = 0.436</div></div></div></div><div class="slider-section" style="background:rgba(255,255,255,.06)"><div class="slider-header"><span class="slider-label" style="color:rgba(255,255,255,0.7)">Adjust Luminosity (L) of Color B</span><span class="slider-value" style="color:rgba(255,255,255,0.8)">0.436</span></div><div class="slider-track-wrap"><div class="slider-gradient" style="background:linear-gradient(to right,oklab(0 0.12192264132337467 -0.001987828345611464),oklab(0.125 0.12192264132337467 -0.001987828345611464),oklab(0.25 0.12192264132337467 -0.001987828345611464),oklab(0.375 0.12192264132337467 -0.001987828345611464),oklab(0.5 0.12192264132337467 -0.001987828345611464),oklab(0.625 0.12192264132337467 -0.001987828345611464),oklab(0.75 0.12192264132337467 -0.001987828345611464),oklab(0.875 0.12192264132337467 -0.001987828345611464),oklab(1 0.12192264132337467 -0.001987828345611464))"></div><input type="range" id="lSlider" min="0" max="1" step="0.001" value="0.4363193186526374" style="--thumb-color:oklab(0.4363193186526374 0.12192264132337467 -0.001987828345611464)"></div></div><div class="actions"><button class="btn btn-submit" id="btnSubmit">Check Match ↵</button></div><div class="settings" style="background:rgba(255,255,255,.06)"><div class="settings-title" style="color:rgba(255,255,255,0.5)">Settings</div><div class="settings-grid"><div><div class="setting-header"><span class="setting-label" style="color:rgba(255,255,255,0.65)">Gap Between Colors</span><span class="setting-val" style="color:rgba(255,255,255,0.5)">40px</span></div><input type="range" id="gapSlider" class="setting-slider" min="0" max="200" step="1" value="40" style="background:rgba(255,255,255,0.15)"></div><div><div class="setting-header"><span class="setting-label" style="color:rgba(255,255,255,0.65)">Background Lightness</span><span class="setting-val" style="color:rgba(255,255,255,0.5)">0.25</span></div><div class="setting-slider-wrap"><div class="bg-gradient-bar"></div><input type="range" id="bgSlider" class="setting-slider" min="0" max="1" step="0.01" value="0.25" style="background:transparent;position:relative;z-index:2"></div></div></div></div><div style="height:2rem"></div></main><footer style="color:rgba(255,255,255,0.2)">OKLAB Luminosity Match · Train your perceptual color sense</footer></div>
+<script>
+(function(){
+  // ===== OKLAB Utilities =====
+  function oklabToCSS(c){return`oklab(${c.L} ${c.a} ${c.b})`}
+
+  function isInGamut(c){
+    var L=c.L,a=c.a,b=c.b;
+    var l_=L+.3963377774*a+.2158037573*b;
+    var m_=L-.1055613458*a-.0638541728*b;
+    var s_=L-.0894841775*a-1.291485548*b;
+    var l=l_*l_*l_,m=m_*m_*m_,s=s_*s_*s_;
+    var rL=4.0767416621*l-3.3077115913*m+.2309699292*s;
+    var gL=-1.2684380046*l+2.6097574011*m-.3413193965*s;
+    var bL=-.0041960863*l-.7034186147*m+1.707614701*s;
+    var mg=.01;
+    return rL>=-mg&&rL<=1+mg&&gL>=-mg&&gL<=1+mg&&bL>=-mg&&bL<=1+mg;
+  }
+
+  function randomOklabColor(){
+    var c,i=0;
+    do{c={L:.3+Math.random()*.5,a:(Math.random()-.5)*.3,b:(Math.random()-.5)*.3};i++}while(!isInGamut(c)&&i<100);
+    return c;
+  }
+
+  function randomOklabColorWithDifferentL(targetL){
+    var c,i=0;
+    do{
+      var nL;
+      do{nL=.15+Math.random()*.7}while(Math.abs(nL-targetL)<.15);
+      c={L:nL,a:(Math.random()-.5)*.3,b:(Math.random()-.5)*.3};i++;
+    }while(!isInGamut(c)&&i<100);
+    return c;
+  }
+
+  // ===== State =====
+  var state={
+    color1:null,color2:null,userL:.5,submitted:false,
+    results:[],gap:40,bgLightness:.25,showHistory:false
+  };
+
+  function newRound(){
+    state.color1=randomOklabColor();
+    state.color2=randomOklabColorWithDifferentL(state.color1.L);
+    state.userL=.15+Math.random()*.7;
+    state.submitted=false;
+  }
+  newRound();
+
+  function calcAccuracy(tL,uL){return Math.max(0,(1-Math.abs(tL-uL)/.5)*100)}
+
+  function accColor(a){
+    if(a>=90)return'c-green';if(a>=70)return'c-emerald';if(a>=50)return'c-yellow';if(a>=30)return'c-orange';return'c-red';
+  }
+  function accEmoji(a){
+    if(a>=95)return'🎯';if(a>=85)return'🔥';if(a>=70)return'👍';if(a>=50)return'😐';if(a>=30)return'😬';return'💀';
+  }
+  function accLabel(a){
+    if(a>=95)return'Perfect!';if(a>=85)return'Excellent!';if(a>=70)return'Good';if(a>=50)return'Decent';if(a>=30)return'Off';return'Way off';
+  }
+
+  function tc(prop){return state.bgLightness>.5?{dark:true}:{dark:false}}
+  function fg(a){return state.bgLightness>.5?'rgba(0,0,0,'+a+')':'rgba(255,255,255,'+a+')';}
+  function panelBg(){return state.bgLightness>.5?'rgba(0,0,0,.06)':'rgba(255,255,255,.06)';}
+
+  // ===== Render =====
+  function render(){
+    var c1=state.color1,c2=state.color2;
+    var c1css=oklabToCSS(c1);
+    var adj={L:state.userL,a:c2.a,b:c2.b};
+    var c2css=oklabToCSS(adj);
+    var bgCSS=oklabToCSS({L:state.bgLightness,a:0,b:0});
+    var accuracy=calcAccuracy(c1.L,state.userL);
+    var avgAcc=null;
+    if(state.results.length>0){
+      var s=0;for(var i=0;i<state.results.length;i++)s+=state.results[i].accuracy;
+      avgAcc=s/state.results.length;
+    }
+    var ideal={L:c1.L,a:c2.a,b:c2.b};
+
+    document.body.style.backgroundColor=bgCSS;
+
+    // Gradient stops for slider
+    var stops=[];
+    for(var st=0;st<=1;st+=.125){
+      stops.push(oklabToCSS({L:st,a:c2.a,b:c2.b}));
+    }
+    var gradStr='linear-gradient(to right,'+stops.join(',')+')';
+
+    var html='';
+    // Header
+    html+='<header><div class="header-inner">';
+    html+='<div><div class="title" style="color:'+fg(.85)+'">OKLAB Luminosity Match</div>';
+    html+='<div class="subtitle" style="color:'+fg(.45)+'">Match the lightness of Color B to Color A</div></div>';
+    if(avgAcc!==null){
+      html+='<div class="avg-box" style="background:'+fg(.08)+'">';
+      html+='<div class="avg-label" style="color:'+fg(.4)+'">Avg. Accuracy</div>';
+      html+='<div class="avg-value '+accColor(avgAcc)+'">'+avgAcc.toFixed(1)+'%</div>';
+      html+='<div class="avg-rounds" style="color:'+fg(.35)+'">'+state.results.length+' round'+(state.results.length!==1?'s':'')+'</div>';
+      html+='</div>';
+    }
+    html+='</div></header>';
+
+    // Main
+    html+='<main>';
+
+    // Swatches
+    html+='<div class="swatches" style="gap:'+state.gap+'px">';
+    // Color A
+    html+='<div class="swatch-col"><div class="swatch" style="background:'+c1css+'">';
+    html+='<div class="swatch-label">Color A · Target</div>';
+    if(state.submitted) html+='<div class="swatch-lval">L = '+c1.L.toFixed(3)+'</div>';
+    html+='</div></div>';
+    // Color B
+    html+='<div class="swatch-col"><div class="swatch" style="background:'+c2css+'">';
+    html+='<div class="swatch-label">Color B · Adjust</div>';
+    html+='<div class="swatch-lval">L = '+state.userL.toFixed(3)+'</div>';
+    html+='</div></div>';
+    html+='</div>';
+
+    // Slider
+    html+='<div class="slider-section" style="background:'+panelBg()+'">';
+    html+='<div class="slider-header">';
+    html+='<span class="slider-label" style="color:'+fg(.7)+'">Adjust Luminosity (L) of Color B</span>';
+    html+='<span class="slider-value" style="color:'+fg(.8)+'">'+state.userL.toFixed(3)+'</span>';
+    html+='</div>';
+    html+='<div class="slider-track-wrap">';
+    html+='<div class="slider-gradient" style="background:'+gradStr+'"></div>';
+    if(state.submitted){
+      html+='<div class="target-marker" style="left:'+(c1.L*100)+'%"></div>';
+    }
+    html+='<input type="range" id="lSlider" min="0" max="1" step="0.001" value="'+state.userL+'"'+(state.submitted?' disabled':'')+' style="--thumb-color:'+c2css+'">';
+    html+='</div></div>';
+
+    // Actions
+    html+='<div class="actions">';
+    if(!state.submitted){
+      html+='<button class="btn btn-submit" id="btnSubmit">Check Match ↵</button>';
+    }else{
+      html+='<div class="result-card" style="background:'+panelBg()+'">';
+      html+='<div class="result-emoji">'+accEmoji(accuracy)+'</div>';
+      html+='<div class="result-accuracy '+accColor(accuracy)+'">'+accuracy.toFixed(1)+'%</div>';
+      html+='<div class="result-label '+accColor(accuracy)+'">'+accLabel(accuracy)+'</div>';
+      html+='<div class="result-grid" style="color:'+fg(.5)+'">';
+      html+='<div><div class="result-grid-title">Target L</div><div class="result-grid-val" style="color:'+fg(.75)+'">'+c1.L.toFixed(3)+'</div></div>';
+      html+='<div><div class="result-grid-title">Your L</div><div class="result-grid-val" style="color:'+fg(.75)+'">'+state.userL.toFixed(3)+'</div></div>';
+      html+='<div><div class="result-grid-title">Difference</div><div class="result-grid-val" style="color:'+fg(.75)+'">'+Math.abs(c1.L-state.userL).toFixed(3)+'</div></div>';
+      html+='</div>';
+      // Comparison swatches
+      html+='<div class="comparison" style="gap:'+state.gap+'px">';
+      html+='<div class="comp-item"><div class="comp-swatch" style="background:'+c1css+'"></div><div class="comp-label" style="color:'+fg(.4)+'">Target A</div></div>';
+      html+='<div class="comp-item"><div class="comp-swatch" style="background:'+oklabToCSS(ideal)+'"></div><div class="comp-label" style="color:'+fg(.4)+'">Ideal B</div></div>';
+      html+='<div class="comp-item"><div class="comp-swatch" style="background:'+c2css+'"></div><div class="comp-label" style="color:'+fg(.4)+'">Your B</div></div>';
+      html+='</div>';
+      html+='</div>';
+      html+='<button class="btn btn-next" id="btnNext">Next Round ↵</button>';
+    }
+    html+='</div>';
+
+    // Settings
+    html+='<div class="settings" style="background:'+panelBg()+'">';
+    html+='<div class="settings-title" style="color:'+fg(.5)+'">Settings</div>';
+    html+='<div class="settings-grid">';
+    // Gap
+    html+='<div>';
+    html+='<div class="setting-header"><span class="setting-label" style="color:'+fg(.65)+'">Gap Between Colors</span><span class="setting-val" style="color:'+fg(.5)+'">'+state.gap+'px</span></div>';
+    html+='<input type="range" id="gapSlider" class="setting-slider" min="0" max="200" step="1" value="'+state.gap+'" style="background:'+fg(.15)+'">';
+    html+='</div>';
+    // Bg
+    html+='<div>';
+    html+='<div class="setting-header"><span class="setting-label" style="color:'+fg(.65)+'">Background Lightness</span><span class="setting-val" style="color:'+fg(.5)+'">'+state.bgLightness.toFixed(2)+'</span></div>';
+    html+='<div class="setting-slider-wrap"><div class="bg-gradient-bar"></div>';
+    html+='<input type="range" id="bgSlider" class="setting-slider" min="0" max="1" step="0.01" value="'+state.bgLightness+'" style="background:transparent;position:relative;z-index:2">';
+    html+='</div></div>';
+    html+='</div></div>';
+
+    // History
+    if(state.results.length>0){
+      html+='<button class="history-toggle'+(state.showHistory?' open':'')+'" id="btnHistory" style="color:'+fg(.45)+'">';
+      html+='<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>';
+      html+='Round History ('+state.results.length+')</button>';
+      if(state.showHistory){
+        html+='<div class="history-table-wrap" style="background:'+panelBg()+'">';
+        html+='<table class="history-table">';
+        html+='<thead><tr style="color:'+fg(.5)+';border-bottom:1px solid '+fg(.1)+'">';
+        html+='<th>#</th><th>Target L</th><th>Your L</th><th>Diff</th><th>Accuracy</th></tr></thead><tbody>';
+        for(var i=0;i<state.results.length;i++){
+          var r=state.results[i];
+          var bb=i<state.results.length-1?'border-bottom:1px solid '+fg(.06):'';
+          html+='<tr style="color:'+fg(.65)+';'+bb+'">';
+          html+='<td>'+(i+1)+'</td><td>'+r.targetL.toFixed(3)+'</td><td>'+r.userL.toFixed(3)+'</td>';
+          html+='<td>'+Math.abs(r.targetL-r.userL).toFixed(3)+'</td>';
+          html+='<td class="'+accColor(r.accuracy)+'">'+r.accuracy.toFixed(1)+'%</td></tr>';
+        }
+        html+='</tbody></table></div>';
+      }
+    }
+
+    html+='<div style="height:2rem"></div></main>';
+    html+='<footer style="color:'+fg(.2)+'">OKLAB Luminosity Match · Train your perceptual color sense</footer>';
+
+    document.getElementById('app').innerHTML=html;
+
+    // Bind events
+    var lSlider=document.getElementById('lSlider');
+    if(lSlider&&!state.submitted){
+      lSlider.addEventListener('input',function(e){
+        state.userL=parseFloat(e.target.value);
+        render();
+      });
+    }
+    var btnSubmit=document.getElementById('btnSubmit');
+    if(btnSubmit){
+      btnSubmit.addEventListener('click',doSubmit);
+    }
+    var btnNext=document.getElementById('btnNext');
+    if(btnNext){
+      btnNext.addEventListener('click',doNext);
+    }
+    var gapSlider=document.getElementById('gapSlider');
+    if(gapSlider){
+      gapSlider.addEventListener('input',function(e){
+        state.gap=parseInt(e.target.value);
+        render();
+      });
+    }
+    var bgSlider=document.getElementById('bgSlider');
+    if(bgSlider){
+      bgSlider.addEventListener('input',function(e){
+        state.bgLightness=parseFloat(e.target.value);
+        render();
+      });
+    }
+    var btnHist=document.getElementById('btnHistory');
+    if(btnHist){
+      btnHist.addEventListener('click',function(){
+        state.showHistory=!state.showHistory;
+        render();
+      });
+    }
+
+    // Preserve focus on L slider after re-render (for keyboard use)
+    if(document.activeElement===document.body && lSlider && !state.submitted){
+      // Don't steal focus
+    }
+  }
+
+  function doSubmit(){
+    if(state.submitted)return;
+    state.submitted=true;
+    var accuracy=calcAccuracy(state.color1.L,state.userL);
+    state.results.push({targetL:state.color1.L,userL:state.userL,accuracy:accuracy});
+    render();
+  }
+
+  function doNext(){
+    newRound();
+    render();
+  }
+
+  // Keyboard: Enter
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      if(state.submitted)doNext();
+      else doSubmit();
+    }
+  });
+
+  render();
+})();
+</script>
+
+
+</body></html>

@@ -1,0 +1,529 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OKLAB Full Color Match</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+      background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+    .game-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .panels {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    .panel {
+      flex: 1;
+      min-width: 280px;
+      max-width: 400px;
+      border-radius: 16px;
+      padding: 15px;
+      text-align: center;
+    }
+    .panel-label {
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .background-area {
+      width: 100%;
+      aspect-ratio: 1.2;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .color-swatch {
+      width: 35%;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      border: 3px solid rgba(255,255,255,0.15);
+    }
+    .controls {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+    .controls h3 {
+      margin-bottom: 15px;
+      font-size: 1rem;
+      color: #aaa;
+    }
+    .sliders {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .slider-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #ccc;
+    }
+    .slider-group input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+    .slider-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    #sliderL { background: linear-gradient(to right, #000, #fff); }
+    #sliderA { background: linear-gradient(to right, #00ff88, #888, #ff0088); }
+    #sliderB { background: linear-gradient(to right, #0066ff, #888, #ffcc00); }
+    .buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 12px 30px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover { transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+    #revealBtn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+    }
+    #newGameBtn {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      color: #fff;
+    }
+    #resetStatsBtn {
+      background: rgba(255,255,255,0.1);
+      color: #aaa;
+      font-size: 0.85rem;
+      padding: 8px 16px;
+    }
+    .result {
+      background: rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      display: none;
+    }
+    .result.show { display: block; }
+    .result h3 { margin-bottom: 10px; font-size: 1.3rem; }
+    .result .delta { color: #ffd93d; font-size: 1.1rem; margin-bottom: 5px; }
+    .result .accuracy { font-size: 2rem; font-weight: 700; }
+    .result .label { color: #888; font-size: 0.9rem; margin-top: 5px; }
+    .result .color-comparison {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .result .comparison-swatch {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .result .comparison-label {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 5px;
+    }
+    .stats {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-item .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #6bcb77;
+    }
+    .stat-item .label {
+      color: #888;
+      font-size: 0.8rem;
+    }
+    .instructions {
+      text-align: center;
+      color: #666;
+      font-size: 0.8rem;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>🎨 OKLAB Color Match</h1>
+    <p class="subtitle">Match the color on the right to the target on the left — beware the background illusion!</p>
+
+    <div class="panels">
+      <div class="panel" style="background: rgba(0,0,0,0.2);">
+        <div class="panel-label">Target Color</div>
+        <div class="background-area" id="bgLeft" style="background-color: rgb(44, 170, 180);">
+          <div class="color-swatch" id="swatchTarget" style="background-color: rgb(120, 16, 111);"></div>
+        </div>
+      </div>
+      <div class="panel" style="background: rgba(0,0,0,0.2);">
+        <div class="panel-label">Your Match</div>
+        <div class="background-area" id="bgRight" style="background-color: rgb(93, 88, 101);">
+          <div class="color-swatch" id="swatchUser" style="background-color: rgb(163, 155, 182);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <h3>Adjust Your Color (OKLAB)</h3>
+      <div class="sliders">
+        <div class="slider-group">
+          <label><span>L (Lightness)</span><span id="valL">0.70</span></label>
+          <input type="range" id="sliderL" min="0" max="1" step="0.005" value="0.5">
+        </div>
+        <div class="slider-group">
+          <label><span>a (Green ↔ Red)</span><span id="valA">0.02</span></label>
+          <input type="range" id="sliderA" min="-0.4" max="0.4" step="0.005" value="0">
+        </div>
+        <div class="slider-group">
+          <label><span>b (Blue ↔ Yellow)</span><span id="valB">-0.04</span></label>
+          <input type="range" id="sliderB" min="-0.4" max="0.4" step="0.005" value="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button id="revealBtn">Reveal &amp; Score</button>
+      <button id="newGameBtn">New Game</button>
+      <button id="resetStatsBtn">Reset Stats</button>
+    </div>
+
+    <div class="result" id="result">
+      <h3 id="resultTitle">Result</h3>
+      <div class="delta" id="resultDelta"></div>
+      <div class="accuracy" id="resultAccuracy"></div>
+      <div class="label" id="resultLabel"></div>
+      <div class="color-comparison">
+        <div>
+          <div class="comparison-swatch" id="compTarget"></div>
+          <div class="comparison-label">Target</div>
+        </div>
+        <div>
+          <div class="comparison-swatch" id="compUser"></div>
+          <div class="comparison-label">Yours</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-item">
+        <div class="value" id="statAvg">93.4%</div>
+        <div class="label">Avg Accuracy</div>
+      </div>
+      <div class="stat-item">
+        <div class="value" id="statDelta">0.049</div>
+        <div class="label">Avg ΔE</div>
+      </div>
+      <div class="stat-item">
+        <div class="value" id="statAttempts">2</div>
+        <div class="label">Attempts</div>
+      </div>
+    </div>
+
+    <p class="instructions">
+      The same color can look different on different backgrounds.<br>
+      Trust your instincts and match the actual color values!
+    </p>
+  </div>
+
+  <script>
+    // ===== OKLAB Conversion Utilities =====
+    function linearToGamma(c) {
+      return c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1/2.4) - 0.055;
+    }
+    function gammaToLinear(c) {
+      return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    }
+    function oklabToLinearRGB(L, a, b) {
+      const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+      const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+      const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+      const l = l_ * l_ * l_;
+      const m = m_ * m_ * m_;
+      const s = s_ * s_ * s_;
+      return [
+        +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+        -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+        -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
+      ];
+    }
+    function linearRGBToOklab(r, g, b) {
+      const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+      const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+      const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+      const l_ = Math.cbrt(l);
+      const m_ = Math.cbrt(m);
+      const s_ = Math.cbrt(s);
+      return [
+        0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_,
+        1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_,
+        0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_
+      ];
+    }
+    function oklabToSRGB(L, a, b) {
+      const [lr, lg, lb] = oklabToLinearRGB(L, a, b);
+      return [
+        Math.round(Math.min(1, Math.max(0, linearToGamma(lr))) * 255),
+        Math.round(Math.min(1, Math.max(0, linearToGamma(lg))) * 255),
+        Math.round(Math.min(1, Math.max(0, linearToGamma(lb))) * 255)
+      ];
+    }
+    function srgbToOklab(r, g, b) {
+      return linearRGBToOklab(gammaToLinear(r/255), gammaToLinear(g/255), gammaToLinear(b/255));
+    }
+    function oklabToCSS(L, a, b) {
+      const [r, g, bl] = oklabToSRGB(L, a, b);
+      return `rgb(${r},${g},${bl})`;
+    }
+    function isInGamut(L, a, b) {
+      const [lr, lg, lb] = oklabToLinearRGB(L, a, b);
+      const margin = -0.001;
+      return lr >= margin && lr <= 1.001 && lg >= margin && lg <= 1.001 && lb >= margin && lb <= 1.001;
+    }
+    function randomOklabInGamut() {
+      for (let i = 0; i < 1000; i++) {
+        const L = 0.25 + Math.random() * 0.5;
+        const a = (Math.random() - 0.5) * 0.5;
+        const b = (Math.random() - 0.5) * 0.5;
+        if (isInGamut(L, a, b)) return { L, a, b };
+      }
+      return { L: 0.5, a: 0, b: 0 };
+    }
+    function deltaE(c1, c2) {
+      const dL = c1.L - c2.L;
+      const da = c1.a - c2.a;
+      const db = c1.b - c2.b;
+      return Math.sqrt(dL * dL + da * da + db * db);
+    }
+
+    // ===== Stats =====
+    const STORAGE_KEY = 'oklab_fullcolor_stats';
+    function loadStats() {
+      try {
+        const d = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (d && typeof d.attempts === 'number') return d;
+      } catch (e) {}
+      return { attempts: 0, totalAccuracy: 0, totalDelta: 0 };
+    }
+    function saveStats(s) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    }
+    function resetStats() {
+      saveStats({ attempts: 0, totalAccuracy: 0, totalDelta: 0 });
+    }
+
+    // ===== Game State =====
+    let targetColor = { L: 0.5, a: 0, b: 0 };
+    let bgLeftColor = { L: 0.5, a: 0, b: 0 };
+    let bgRightColor = { L: 0.5, a: 0, b: 0 };
+    let revealed = false;
+
+    // ===== DOM Elements =====
+    const sliderL = document.getElementById('sliderL');
+    const sliderA = document.getElementById('sliderA');
+    const sliderB = document.getElementById('sliderB');
+    const valL = document.getElementById('valL');
+    const valA = document.getElementById('valA');
+    const valB = document.getElementById('valB');
+    const bgLeft = document.getElementById('bgLeft');
+    const bgRight = document.getElementById('bgRight');
+    const swatchTarget = document.getElementById('swatchTarget');
+    const swatchUser = document.getElementById('swatchUser');
+    const revealBtn = document.getElementById('revealBtn');
+    const newGameBtn = document.getElementById('newGameBtn');
+    const resetStatsBtn = document.getElementById('resetStatsBtn');
+    const resultDiv = document.getElementById('result');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultDelta = document.getElementById('resultDelta');
+    const resultAccuracy = document.getElementById('resultAccuracy');
+    const resultLabel = document.getElementById('resultLabel');
+    const compTarget = document.getElementById('compTarget');
+    const compUser = document.getElementById('compUser');
+    const statAvg = document.getElementById('statAvg');
+    const statDelta = document.getElementById('statDelta');
+    const statAttempts = document.getElementById('statAttempts');
+
+    // ===== Functions =====
+    function getUserColor() {
+      return {
+        L: parseFloat(sliderL.value),
+        a: parseFloat(sliderA.value),
+        b: parseFloat(sliderB.value)
+      };
+    }
+
+    function updateUserSwatch() {
+      const c = getUserColor();
+      valL.textContent = c.L.toFixed(2);
+      valA.textContent = c.a.toFixed(2);
+      valB.textContent = c.b.toFixed(2);
+      swatchUser.style.backgroundColor = oklabToCSS(c.L, c.a, c.b);
+    }
+
+    function updateStatsDisplay() {
+      const s = loadStats();
+      if (s.attempts === 0) {
+        statAvg.textContent = '--%';
+        statDelta.textContent = '--';
+      } else {
+        statAvg.textContent = (s.totalAccuracy / s.attempts).toFixed(1) + '%';
+        statDelta.textContent = (s.totalDelta / s.attempts).toFixed(3);
+      }
+      statAttempts.textContent = s.attempts;
+    }
+
+    function newGame() {
+      revealed = false;
+      resultDiv.classList.remove('show');
+      
+      // Generate target and two different background colors
+      targetColor = randomOklabInGamut();
+      bgLeftColor = randomOklabInGamut();
+      bgRightColor = randomOklabInGamut();
+      
+      // Make sure backgrounds are noticeably different
+      while (deltaE(bgLeftColor, bgRightColor) < 0.15) {
+        bgRightColor = randomOklabInGamut();
+      }
+      
+      // Random starting position for user (not too close to target)
+      let startColor = randomOklabInGamut();
+      sliderL.value = startColor.L;
+      sliderA.value = startColor.a;
+      sliderB.value = startColor.b;
+      
+      // Update display
+      bgLeft.style.backgroundColor = oklabToCSS(bgLeftColor.L, bgLeftColor.a, bgLeftColor.b);
+      bgRight.style.backgroundColor = oklabToCSS(bgRightColor.L, bgRightColor.a, bgRightColor.b);
+      swatchTarget.style.backgroundColor = oklabToCSS(targetColor.L, targetColor.a, targetColor.b);
+      updateUserSwatch();
+      
+      revealBtn.disabled = false;
+      revealBtn.textContent = 'Reveal & Score';
+    }
+
+    function reveal() {
+      if (revealed) return;
+      revealed = true;
+      
+      const userColor = getUserColor();
+      const delta = deltaE(targetColor, userColor);
+      
+      // Max possible delta in our range is roughly sqrt(0.5^2 + 0.4^2 + 0.4^2) ≈ 0.75
+      const maxDelta = 0.75;
+      const accuracy = Math.max(0, (1 - delta / maxDelta) * 100);
+      
+      // Update stats
+      const s = loadStats();
+      s.attempts++;
+      s.totalAccuracy += accuracy;
+      s.totalDelta += delta;
+      saveStats(s);
+      updateStatsDisplay();
+      
+      // Determine label
+      let label, emoji;
+      if (accuracy >= 95) { label = 'Perfect!'; emoji = '🏆'; }
+      else if (accuracy >= 85) { label = 'Excellent!'; emoji = '🌟'; }
+      else if (accuracy >= 70) { label = 'Great!'; emoji = '👏'; }
+      else if (accuracy >= 50) { label = 'Good try!'; emoji = '👍'; }
+      else if (accuracy >= 30) { label = 'Keep practicing!'; emoji = '💪'; }
+      else { label = 'Those backgrounds are tricky!'; emoji = '🎨'; }
+      
+      resultTitle.textContent = `${emoji} ${label}`;
+      resultDelta.textContent = `ΔE = ${delta.toFixed(4)}`;
+      resultAccuracy.textContent = `${accuracy.toFixed(1)}%`;
+      resultLabel.textContent = `Target: L=${targetColor.L.toFixed(2)} a=${targetColor.a.toFixed(2)} b=${targetColor.b.toFixed(2)}`;
+      
+      compTarget.style.backgroundColor = oklabToCSS(targetColor.L, targetColor.a, targetColor.b);
+      compUser.style.backgroundColor = oklabToCSS(userColor.L, userColor.a, userColor.b);
+      
+      resultDiv.classList.add('show');
+      revealBtn.disabled = true;
+      revealBtn.textContent = 'Revealed!';
+    }
+
+    // ===== Event Listeners =====
+    sliderL.addEventListener('input', updateUserSwatch);
+    sliderA.addEventListener('input', updateUserSwatch);
+    sliderB.addEventListener('input', updateUserSwatch);
+    revealBtn.addEventListener('click', reveal);
+    newGameBtn.addEventListener('click', newGame);
+    resetStatsBtn.addEventListener('click', () => {
+      resetStats();
+      updateStatsDisplay();
+    });
+
+    // ===== Init =====
+    updateStatsDisplay();
+    newGame();
+  </script>
+
+
+</body></html>
