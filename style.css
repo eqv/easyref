@@ -33,6 +33,10 @@ video {
   width: 36px;
 }
 
+#zoom-camera{
+  padding: 24px;
+}
+
 .mix-options {}
 
 /* refence picker */

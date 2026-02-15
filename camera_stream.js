@@ -12,13 +12,15 @@ const snapshot_image = document.querySelector('#snapshot-img');
 const play = document.querySelector('#play');
 const pause = document.querySelector('#pause');
 const zoom = document.querySelector('#zoom');
+const zoom_camera = document.querySelector('#zoom-camera');
 
 
 let stream_started = false;
+let camera_zoom_factor = 1;
 
 const constraints = {
   video: {
-    facingMode: { exact: "environment" },
+    facingMode: { ideal: "environment" },
     width: {
       min: 1280,
       ideal: 1920,
@@ -152,7 +154,7 @@ btn_ref_use.onclick = goto_main_frame;
 input_ref_file.onchange = handle_file_dialoge;
 
 const pinch_align_video = (delta_x, delta_y, delta_s, delta_a) => {
-  video.style.transform = "scale(" + delta_s + ") translate(" + delta_x + "px," + delta_y + "px)" + " rotate(" + (delta_a) + "deg)";
+  video.style.transform = "scale("+camera_zoom_factor+") scale(" + delta_s + ") translate(" + delta_x + "px," + delta_y + "px)" + " rotate(" + (delta_a) + "deg)";
 }
 
 const pinch_zoom_content = (delta_x, delta_y, delta_s, delta_a) => {
@@ -175,5 +177,12 @@ const set_pinch_zoom_mode = () => {
   }
 }
 zoom.onclick = set_pinch_zoom_mode;
+
+
+const set_camera_zoom = e => {
+  camera_zoom_factor = e.target.value
+  video.style.transform = "scale(" + camera_zoom_factor + ")";
+}
+zoom_camera.oninput = set_camera_zoom;
 
 //goto_main_frame();
